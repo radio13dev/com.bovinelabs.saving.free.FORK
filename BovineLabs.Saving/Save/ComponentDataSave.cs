@@ -2,6 +2,8 @@
 //     Copyright (c) BovineLabs. All rights reserved.
 // </copyright>
 
+#define DEBUG_COMPONENT_ERROR
+
 namespace BovineLabs.Saving
 {
     using System;
@@ -89,6 +91,9 @@ namespace BovineLabs.Saving
                     Remap = entityMap,
                     DeserializedData = deserializedData,
                     ElementSize = this.componentSave.TypeInfo.ElementSize,
+                    #if DEBUG_COMPONENT_ERROR
+                    Debug_DynamicComponentTypeHandleString = dynamicHandle.ToFixedString()
+                    #endif
                 }
                 .Schedule(dependency);
 
@@ -261,6 +266,11 @@ namespace BovineLabs.Saving
 
             public int ElementSize;
 
+#if DEBUG_COMPONENT_ERROR
+            [ReadOnly]
+            public FixedString512Bytes Debug_DynamicComponentTypeHandleString;
+#endif
+
             public void Execute()
             {
                 this.Deserializer.Offset<HeaderSaver>();
@@ -299,6 +309,9 @@ namespace BovineLabs.Saving
                         else
                         {
                             Debug.LogError($"Entity {entities[i]} wasn't found");
+#if DEBUG_COMPONENT_ERROR
+                            Debug.LogError($"Failing component: {Debug_DynamicComponentTypeHandleString}");
+#endif
                         }
                     }
 
