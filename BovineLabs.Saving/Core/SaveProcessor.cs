@@ -2,6 +2,10 @@
 //     Copyright (c) BovineLabs. All rights reserved.
 // </copyright>
 
+using System.IO;
+using System.IO.Compression;
+using System.Runtime.InteropServices;
+
 namespace BovineLabs.Saving
 {
     using System;
@@ -648,15 +652,24 @@ namespace BovineLabs.Saving
                 {
                     return;
                 }
-
+                
                 var src = this.SaveData->Ptr;
-                var compressedLength = CodecService.Compress(Codec.LZ4, src, this.SaveData->Length, out var dst);
+                
+                //var compressedLength = CodecService.Compress(Codec.LZ4, src, this.SaveData->Length, out var dst);
 
+                //var dst2 = new NativeArray<byte>(this.SaveData->Length, Allocator.Temp);
+                //BrotliEncoder.TryCompress(new ReadOnlySpan<byte>(src, this.SaveData->Length), dst2, out int compressedLength2);
+                
+                var dst3 = new NativeArray<byte>(this.SaveData->Length, Allocator.Temp);
+                NativeArray<byte>.Copy(this.SaveData->AsArray(), 0, dst3, 0, this.SaveData->Length);
+                var compressedLength3 = this.SaveData->Length;
+                
                 this.SaveData->Clear();
 
-                var header = new HeaderCompression { UncompressedLength = uncompressedLength, CompressedLength = compressedLength };
+                var header = new HeaderCompression { UncompressedLength = uncompressedLength, CompressedLength = compressedLength3 };
                 this.SaveData->AddRange(&header, UnsafeUtility.SizeOf<HeaderCompression>());
-                this.SaveData->AddRange(dst, compressedLength);
+                this.SaveData->AddRange(dst3.GetUnsafePtr(), compressedLength3);
+                dst3.Dispose();
             }
         }
 
@@ -683,10 +696,13 @@ namespace BovineLabs.Saving
                 var decompressed = (byte*)this.Decompressed.GetUnsafeReadOnlyPtr();
                 var dst = decompressed + data.DecompressedIndex;
 
-                var success = CodecService.Decompress(Codec.LZ4, src, compressionInfo.CompressedLength, dst, compressionInfo.UncompressedLength);
+                //var success = CodecService.Decompress(Codec.LZ4, src, compressionInfo.CompressedLength, dst, compressionInfo.UncompressedLength);
+                //var success = BrotliDecoder.TryDecompress(new ReadOnlySpan<byte>(src, compressionInfo.CompressedLength), new Span<byte>(dst, compressionInfo.UncompressedLength), out int bytesWritten);
+                NativeArray<byte>.Copy(this.Compressed, data.CompressedIndex + UnsafeUtility.SizeOf<HeaderCompression>(), this.Decompressed, data.DecompressedIndex, compressionInfo.UncompressedLength);
+                var success = true;
 
                 if (!success)
-                {
+                { 
                     Debug.LogError("Failed to decompress save");
                 }
             }
