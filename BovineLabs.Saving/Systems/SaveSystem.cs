@@ -97,14 +97,14 @@ namespace BovineLabs.Saving
         [BurstCompile]
         public void OnUpdate(ref SystemState state)
         {
-            var debug = SystemAPI.GetSingleton<BLDebug>();
+            var debug = SystemAPI.GetSingleton<BLLogger>();
 
             this.TryLoad(ref state, debug);
             var didApply = this.TryApply(ref state, debug);
             this.TrySave(ref state, didApply, debug);
         }
 
-        private void TryLoad(ref SystemState state, BLDebug debug)
+        private void TryLoad(ref SystemState state, BLLogger debug)
         {
             if (this.loadQuery.IsEmptyIgnoreFilter)
             {
@@ -113,13 +113,13 @@ namespace BovineLabs.Saving
 
             var loadBuffer = this.loadQuery.GetSingletonBuffer<LoadBuffer>();
 
-            debug.Debug($"Loading save of size {loadBuffer.Length} bytes");
+            debug.LogDebug($"Loading save of size {loadBuffer.Length} bytes");
 
             this.Deserialize(loadBuffer.Reinterpret<byte>());
             state.EntityManager.DestroyEntity(this.loadQuery);
         }
 
-        private bool TryApply(ref SystemState state, BLDebug debug)
+        private bool TryApply(ref SystemState state, BLLogger debug)
         {
             this.stateQuery.CompleteDependency();
             if (this.saveState.LoadSet.IsEmpty)
@@ -152,7 +152,7 @@ namespace BovineLabs.Saving
                     Section = sceneSectionData.SubSectionIndex,
                 });
 
-                debug.Verbose($"Apply save data to {entity.ToFixedString()}");
+                debug.LogVerbose($"Apply save data to {entity.ToFixedString()}");
 
                 state.Dependency = this.saveProcessor.Load(ref state, saveData.AsArray(), state.Dependency);
                 any = true;
@@ -161,14 +161,14 @@ namespace BovineLabs.Saving
             return any;
         }
 
-        private void TrySave(ref SystemState state, bool completeDependency, BLDebug debug)
+        private void TrySave(ref SystemState state, bool completeDependency, BLLogger debug)
         {
             if (this.saveQuery.IsEmptyIgnoreFilter)
             {
                 return;
             }
 
-            debug.Debug("Saving the world");
+            debug.LogDebug("Saving the world");
 
             // On the rare chance we load data same frame as we need to save, we need to finish that work otherwise we'll have a dependency issue
             if (completeDependency)
