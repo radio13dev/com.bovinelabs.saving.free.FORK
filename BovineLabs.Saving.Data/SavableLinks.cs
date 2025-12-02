@@ -12,9 +12,4 @@ namespace BovineLabs.Saving.Data
         public Entity Entity;
         public ulong LinkID;
     }
-    
-    [Save]
-    public struct SavableLinks_Instantiated : IComponentData, IEnableableComponent
-    {
-    }
 }

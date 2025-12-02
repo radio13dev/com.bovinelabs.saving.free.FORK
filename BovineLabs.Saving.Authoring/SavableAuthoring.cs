@@ -35,7 +35,6 @@ namespace BovineLabs.Saving.Authoring
                 var childrenLinks = authoring.GetComponentsInChildren<SavableAuthoring>(false).Where(s => s != authoring).ToArray();
                 if (childrenLinks.Length > 0)
                 {
-                    this.AddComponent<SavableLinks_Instantiated>(entity);
                     var savableLinks = this.AddBuffer<SavableLinks>(entity);
 
                     foreach (var link in childrenLinks)
