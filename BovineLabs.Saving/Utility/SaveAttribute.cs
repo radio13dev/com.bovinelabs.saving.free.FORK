@@ -21,4 +21,9 @@ namespace BovineLabs.Saving
 
         public SaveFeature Feature { get; }
     }
+    
+    [Save]
+    public struct SavableLinks_Instantiated : IComponentData, IEnableableComponent
+    {
+    }
 }

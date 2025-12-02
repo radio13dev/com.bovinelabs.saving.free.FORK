@@ -13,9 +13,4 @@ namespace BovineLabs.Saving.Authoring
         public GlobalObjectId GlobalObjectId;
         public bool IsPrefab;
     }
-    
-    [BovineLabs.Saving.Save]
-    public struct SavableLinks_Instantiated : IComponentData, IEnableableComponent
-    {
-    }
 }
