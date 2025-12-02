@@ -5,7 +5,6 @@
         "BovineLabs.Core",
         "BovineLabs.Core.Authoring",
         "BovineLabs.Saving.Data",
-        "BovineLabs.Saving",
         "Unity.Burst",
         "Unity.Collections",
         "Unity.Entities",
