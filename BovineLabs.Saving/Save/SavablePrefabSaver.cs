@@ -341,6 +341,8 @@ namespace BovineLabs.Saving
 
                     capacity += chunk.Count * (UnsafeUtility.SizeOf<Entity>() + UnsafeUtility.SizeOf<SavablePrefab>());
                     var savableLinks = chunk.GetBufferAccessor(ref this.SavableLinksHandle);
+                    
+                    capacity += UnsafeUtility.SizeOf<HeaderChunk>();
 
                     for (var i = 0; i < savableLinks.Length; i++)
                     {
@@ -376,7 +378,7 @@ namespace BovineLabs.Saving
                     var savableLinks = chunk.GetBufferAccessor(ref this.SavableLinksHandle);
                     entityCount += chunk.Count;
 
-                    this.Serializer.Add(new HeaderChunk
+                    this.Serializer.AddNoResize(new HeaderChunk
                     {
                         Length = chunk.Count,
                         SavableLinks = savableLinks.Length > 0,
